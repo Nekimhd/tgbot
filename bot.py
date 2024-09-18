@@ -1,5 +1,5 @@
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputFile
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Включаем логирование
@@ -42,23 +42,26 @@ def start(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Путь к файлу изображения
+    # Прямая ссылка на изображение
     photo_url = 'https://i.ibb.co/p1YMNzH/9399c0df-d61e-459a-8334-d4523d933144.jpg'
 
-    # Отправка сообщения с фотографией и кнопкой
-    with open(photo_path, 'rb') as photo:
-        context.bot.send_photo(chat_id=chat_id, photo=photo, caption=message_text, reply_markup=reply_markup)
+    try:
+        # Отправка сообщения с фотографией и кнопкой
+        context.bot.send_photo(chat_id=chat_id, photo=photo_url, caption=message_text, reply_markup=reply_markup)
+    except Exception as e:
+        logger.error(f"Error sending photo: {e}")
 
 def main() -> None:
     updater = Updater(TOKEN)
 
     dispatcher = updater.dispatcher
-
     dispatcher.add_handler(CommandHandler("start", start))
 
-    updater.start_polling()
-
-    updater.idle()
+    try:
+        updater.start_polling()
+        updater.idle()
+    except Exception as e:
+        logger.error(f"Error starting the bot: {e}")
 
 if __name__ == '__main__':
     main()
